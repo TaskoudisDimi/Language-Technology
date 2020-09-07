@@ -1,0 +1,285 @@
+\documentclass{beamer}
+
+\usepackage{beamerthemesplit}
+
+\usepackage[english]{babel}
+%\usepackage[iso-8859-7]{inputenc}
+
+\usepackage{multimedia}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{epsf}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{indentfirst}
+\usepackage{amsfonts}
+\usepackage{bigints}
+\usepackage{gfsdidot}
+\usepackage{mathtools}
+\usepackage{xcolor}
+\usepackage{float}
+ \usepackage{wrapfig}
+
+%\usetheme{Marburg}
+\usefonttheme{serif}
+\usetheme{CambridgeUS}
+%\usetheme{Berlin}
+%\usetheme{Copenhagen}
+%\usetheme{Luebeck}
+
+
+%My definitions
+\def\b#1{{\mathbf #1}}
+\def\ca#1{{\mathcal #1}}
+\def\bg#1{\mbox{\boldmath${#1}$}} %for bold greek letters in math mode
+\def\mrm#1{{\mathrm{{#1}}}}
+\def\msf#1{{\mathsf{{#1}}}}
+\def\tr{\mrm{tr}}
+\newcommand{\lat } {\latintext}
+
+
+
+\title[Neural Machine Translation]{Language Technology Assignment: Neural Machine Translation}
+
+\author[Taskoudis $\&$ Fragkouli]{Taskoudis Dimitris and Fragkouli Styliani Christina}
+
+
+\institute{ Aristotle University of Thessaloniki\bigbreak
+\normalsize{Language Technology Assignment}
+
+}
+
+\date{\small{ Juny 12th, 2020}}
+
+
+\begin{document}
+
+\frame{\titlepage}
+
+\section{THEORY}
+
+\begin{frame}{Introduction}
+\begin{itemize}
+\item One of the earliest goals for computers
+was the \textbf{automatic translation} of text from one language to another.
+
+
+
+\item Statistical machine translation is the
+use of \textbf{statistical models} that learn to make transaltions
+
+
+
+\item "Given a sentence T in the target language, we seek the sentence S from which the translator produced T. We know that our chance of error is minimized by choosing that sentence S that is \textbf{most probable} given T. Thus, we wish to choose S so as to maximize Pr(S$\vert$T)."
+
+
+\item Suffered from a \textbf{narrow focus} on the phrases being
+translated, losing the broader nature of the target text.
+
+\end{itemize}
+\end{frame}
+
+%	%	%	%	%	%	%	%	%	%
+
+\begin{frame}{Neural Machine Translation}
+	\begin{itemize}
+	\item Use of \textbf{neural network} models to learn a statistical model for machine translation
+	
+	\item Single system can be trained \textbf{directly on source and target text}, no longer requiring the pipeline of specialized systems
+	
+	\item \textbf{end-to-end} = single model (NN)
+		
+	\end{itemize}
+\end{frame}
+
+%	%	%	%	%	%	%	%	%	%
+
+
+\begin{frame}{Word Embeddings}
+	\begin{itemize}
+
+
+\item Word embeddings are a type of \textbf{word representation} that allows words with \textbf{similar meaning} to have a similar representation
+
+\item Each word is mapped to one \textbf{vector}
+
+\item \textbf{“distributional hypothesis”} by Zellig Harris that could be summarized as: \textbf{“words that have similar context will have similar meanings.”}
+
+	\end{itemize}
+\end{frame}
+
+
+%	%	%	%	%	%	%	%	%	%
+
+
+\begin{frame}{Sequence-to-sequence with LSTM}
+	\begin{itemize}
+		\item Seq2seq learning is about training
+		models to convert sequences from one domain to sequences in another domain
+		
+		\item \textbf{Canonical} seq2seq case is when input and output sequences have \textbf{different lengths}
+		
+		\item Addressed with an \textbf{RNN} architecture
+		
+		\item \textbf{Encoder}: processes the input sequence and returns its own internal state
+		
+		
+		\item \textbf{Decoder}: trained to predict the next characters of the target sequence
+		
+		\item Key to this architecture is the ability of the model to encode the source text into an internal \textbf{fixed-length} representation called the \textbf{context vector}.
+		
+	\end{itemize}
+\end{frame}
+
+%	%	%	%	%	%	%	%	%	%
+
+\begin{frame}{BLEU Score}
+	\begin{itemize}
+		\item Bilingual Evaluation Understudy, is a score for \textbf{comparing} a candidate translation of text to one or more reference translations.
+		
+		\item compelling benefits: \\
+		\item is quick and inexpensive to calculate\\
+		\item is easy to understand\\
+	\item	it is language independent, \\
+	\item	it correlates highly with human evaluation and it has been widely adopted.
+	\item Depending on which \textbf{$n-grams$} were used the corresponding score is also \textbf{$BLUE-n$}
+		
+	\end{itemize}\end{frame}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
+
+
+\section{CODE}
+
+\begin{frame}{Pre-Processing}
+	\begin{itemize}
+		\item The data refer to the translation of sentences - words from \textbf{German} to \textbf{English}
+		\item The first step: clean the data from its \textbf{original form}
+		\item The text divided by \textbf{line} and into a \textbf{sentence}
+		\item  \textbf{Remove} all non-printable characters, all
+		punctuation characters,  any they are not alphabetical, \textbf{normalize} all Unicode characters in ASCII, the case in lower case letters
+		\item  \textbf{Reduced} the data set to the first 10,000 copies and \textbf{mixed} the samples for higher performance of the model
+		
+		
+	\end{itemize}
+\end{frame}
+
+%	%	%	%	%	%	%	%	%	%
+
+\begin{frame}{Create the neural machine translation I}
+	\begin{itemize}
+		\item Matching words to integers and a separate \textbf{tokenizer} was applied to English and German sequences
+		\item Encode each input and output sequence into \textbf{integers}
+		\item Create a \textbf{table} for each sequence and \textbf{add zero values} to the sequences that were smaller in maximum length
+		\item \textbf{One-hot} encode sequences
+		\item \textbf{Decoding} the output sequence because the model must \textbf{predict} the probability of each word in the vocabulary as output
+		
+		
+	\end{itemize}
+\end{frame}
+
+
+%	%	%	%	%	%	%	%	%	%
+
+\begin{frame}{Create the neural machine translation II}
+	\begin{itemize}
+		\item The next phase: \textbf{creation} of the model
+		\item \textbf{Model structure}: two LSTM layers, one Embedding, one RepeatVector,one TimeDistributed and one Dense layer
+		\item \textbf{Embedding} layer turns positive integers (indexes) into dense vectors of fixed size
+		\item \textbf{Repeat vector} layer repeats the input n times
+		\item \textbf{Dense} layer applied to every sample it receives as an input (the size of the English vocabulary size)
+		\item Apply the last \textbf{LSTM} output a value for each time step in the input data
+		\item The input sequence encoded by a \textbf{front-end} model called the encoder then decoded word by word by a \textbf{backend} model called the decoder
+	\end{itemize}
+\end{frame}
+
+%	%	%	%	%	%	%	%	%	%
+
+\begin{frame}{Model evaluation}
+	\begin{itemize}
+		\item The \textbf{evaluation} includes two steps: create a translated output sequence and repeat the process for many input examples
+		\item The model can \textbf{predict} the entire output sequence in a \textbf{one-shot manner}. A sequence of integers that can be enumerate and lookup in the tokenizer to map back to words
+		\item \textbf{Repetition} for each source phrase in a set of data and \textbf{compare} the predicted result with the expected phrase target in English
+		\item Use \textbf{BLEU score} and \textbf{loss function}
+		\item \textbf{Results}: Train score $> > $Test score
+	\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Initial model results}
+
+		
+	\begin{figure}[h]
+		\includegraphics[scale=0.4] {initian plot}
+	\end{figure}
+	
+	
+  	\begin{figure}[h]
+		\includegraphics[scale=0.30] {initial TABLE}
+	\end{figure}
+	
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{ARCHITECTURE ALTERATIONS}
+
+\begin{frame}{Dropout 30percent}
+	\begin{itemize}
+		\item Use of the \textbf{dropout parameter} set to 30 percent in the LSTM layers. Purpose: reduction over-fitting
+	\end{itemize}
+
+
+\begin{figure}[h]
+	
+	\includegraphics[scale=0.4] {dropout 30percent}
+
+\end{figure}
+
+
+\begin{figure}[h]
+	\includegraphics[scale=0.3] {dropout 30percent TABLE}
+\end{figure}
+\end{frame}
+
+%	%	%	%	%	%	%	%	%	%
+
+\begin{frame}{Bidirectional LSTM layers}
+	\begin{itemize}
+		\item \textbf{Duplicate} the first recurrent layer in the network 
+	\end{itemize}
+
+\begin{figure}[h]
+	
+	\includegraphics[scale=0.4] {bi in encoder and decoder}
+
+\end{figure}
+
+
+
+\begin{figure}[h]
+	\includegraphics[scale=0.3] {bi in encoder and decoder TABLE}
+
+\end{figure}
+
+
+\end{frame}
+
+%	%	%	%	%	%	%	%	%	%
+\section{THE END}
+\begin{frame}{ 
+	\centering
+	\LARGE{Thank you!}}
+
+\begin{figure}[h]
+	\includegraphics[scale=0.3] {robot}
+\end{figure}
+
+\end{frame}
+
+
+\end{document}
